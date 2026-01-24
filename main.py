@@ -1,12 +1,10 @@
-import calendar
 from data_structures import Circular_List, List_Pointer, ChainingHashTable
+from date import is_date_in_range, get_date_list
+from filter import global_filter, task_filter
 from duty_engine import (
     load_all_data, get_start_index, get_next_available, 
     export_results, worker_info_map, get_all_exp, DUTY_ENUM
 )
-from date import is_date_in_range
-from filter import global_filter, task_filter
-
 
 def main():
     # 1. 데이터 로드
@@ -52,17 +50,13 @@ def main():
     # 4. 배정 년/월 및 날짜 리스트 생성
     print("\n배정 년/월 입력 (예: 2026 1):")
     year, month = map(int, input().split())
-    date_list = [day.strftime("%Y-%m-%d") for week in calendar.Calendar().monthdatescalendar(year, month) 
-                 for day in week if day.month == month]
+    date_list = get_date_list(year, month)
 
     duty_types = ["위병부조장", "식기"] + [f"불침번{i}" for i in range(1,6)] + ["초병_1조", "초병_2조"] + [f"CCTV{i}" for i in range(1,7)]
     exp_types = get_all_exp(exceptions)
     
-
-
     date_hash = ChainingHashTable(40)
  
-    # 해시테이블 뼈대 구성
     for day in date_list:
         today_duty = ChainingHashTable(20)
         for e in exp_types : today_duty.set(e, [])
@@ -79,9 +73,10 @@ def main():
         
         assigned_today = set()
         
+        # 당일 예외인원들 집합에 추가
         for e in exp_types:
-            for exp_worker in today_duty.get(e): assigned_today.add(exp_worker)
-
+            for exp_worker in today_duty.get(e): 
+                assigned_today.add(exp_worker)
 
         # --- 배정 ---
         
@@ -112,7 +107,6 @@ def main():
                 today_duty.get(f"CCTV{i}").append(get_next_available(ptr_cctv, assigned_today, DUTY_ENUM.CCTV))
 
         date_hash.set(day, today_duty)
-
 
     # 6. 결과 출력
     export_results(date_list, date_hash, worker_data, duty_types+exp_types)

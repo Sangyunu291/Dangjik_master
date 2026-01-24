@@ -9,7 +9,6 @@ def global_filter(date_hash, date_list, exceptions):
         exp_info = (e['군번'], e['시작일'], e['종료일'], e['사유'])
         exception_list.append(exp_info)
 
-    #print(exception_list)
     for day in date_list:
         today_duty = date_hash.get(day)
         for exp_worker in exception_list:
@@ -21,18 +20,8 @@ def global_filter(date_hash, date_list, exceptions):
 def task_filter(sn, duty_type, worker_info_map):
     #가능근무 데이터(예: '11101') 기반 필터링:
     #순서는 위병부조장,식기,불침번,초병,CCTV로 고정
+    #호출함수: get_next_available()
     work_bit = worker_info_map.get(sn)['가능근무']
     return work_bit[duty_type] == '0'
 
 
-# ---------------------------------------------------------
-# CASE 3. 날짜별 보직 활성화 체크
-# 목적: 특정 근무가 없는 날 (식기 없는 날, 훈련) 근무 제외
-# ---------------------------------------------------------
-
-def date_duty_filter(day, duty_type):
-    """
-    - 근무 공정표 보니 1월에 2회 식기 없는 날 존재
-    - 단체로 훈련 나가는 날 특정 근무 없음 
-    """
-    pass

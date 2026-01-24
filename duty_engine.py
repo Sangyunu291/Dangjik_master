@@ -7,7 +7,7 @@ from filter import task_filter
 # --- [전역 매핑 변수] ---
 worker_info_map = ChainingHashTable(100)
 
-#가능근무 확인용  enum
+# --- [근무 인덱스 enum] --- 
 class DUTY_ENUM(IntEnum):
     SUB_GUARD = 0
     DISH = 1
@@ -26,8 +26,6 @@ def get_start_index(c_list, last_sn):
 def get_next_available(ptr, assigned_set, duty_type):
     while True:
         sn = ptr.get_val()
-        if sn == '25-760019':
-            print(worker_info_map.get(sn)['이름'], worker_info_map.get(sn)['가능근무'], duty_type, task_filter(sn, duty_type, worker_info_map))
         if sn in assigned_set or task_filter(sn, duty_type, worker_info_map):
             continue
                 
