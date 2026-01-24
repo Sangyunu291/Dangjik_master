@@ -2,10 +2,11 @@ import calendar
 from data_structures import Circular_List, List_Pointer, ChainingHashTable
 from duty_engine import (
     load_all_data, get_start_index, get_next_available, 
-    is_date_in_range, export_results, worker_info_map, get_all_exp
+    export_results, worker_info_map, get_all_exp, DUTY_ENUM
 )
+from date import is_date_in_range
+from filter import global_filter, task_filter
 
-from filter import global_filter
 
 def main():
     # 1. 데이터 로드
@@ -19,6 +20,8 @@ def main():
 
     # 2. 인원 분류 및 원형 리스트 생성
     worker_data.sort(key=lambda x: x['전입일'])
+
+
     mid = len(worker_data) // 2
     
     c_list_all = Circular_List()
@@ -69,9 +72,6 @@ def main():
     # 해시테이블에 예외 인원들 미리 작성
     global_filter(date_hash, date_list, exceptions)
 
-    
-
-
     # 5. 배정 시작
     dish_skip_count = 0
     for day in date_list:
@@ -86,7 +86,8 @@ def main():
         # --- 배정 ---
         
         # 1. 위병부조장
-        today_duty.get("위병부조장").append(get_next_available(ptr_sub_guard, assigned_today, "위병부조장"))
+        
+        today_duty.get("위병부조장").append(get_next_available(ptr_sub_guard, assigned_today, DUTY_ENUM.SUB_GUARD))
         
         # 2. 식기
         dish_skip_count += 1
@@ -94,28 +95,24 @@ def main():
             today_duty.get("식기").append('72사단')
         else:
             for _ in range(3):
-                today_duty.get("식기").append(get_next_available(ptr_dish, assigned_today, "식기"))
+                today_duty.get("식기").append(get_next_available(ptr_dish, assigned_today, DUTY_ENUM.DISH))
 
         # 3. 불침번
         for i in range(1, 6):
-            today_duty.get(f"불침번{i}").append(get_next_available(ptr_night, assigned_today, "불침번"))
+            today_duty.get(f"불침번{i}").append(get_next_available(ptr_night, assigned_today, DUTY_ENUM.NIGHT))
 
         # 4. 초병 (1조, 2조)
         for t in ["초병_1조", "초병_2조"]:
-            today_duty.get(t).append(get_next_available(ptr_sr_sentinel, assigned_today, "초병"))
-            today_duty.get(t).append(get_next_available(ptr_jr_sentinel, assigned_today, "초병"))
+            today_duty.get(t).append(get_next_available(ptr_sr_sentinel, assigned_today, DUTY_ENUM.SENTINEL))
+            today_duty.get(t).append(get_next_available(ptr_jr_sentinel, assigned_today, DUTY_ENUM.SENTINEL))
 
         # 5. CCTV
         for i in range(1, 7):
             for _ in range(3):
-                today_duty.get(f"CCTV{i}").append(get_next_available(ptr_cctv, assigned_today, "CCTV"))
+                today_duty.get(f"CCTV{i}").append(get_next_available(ptr_cctv, assigned_today, DUTY_ENUM.CCTV))
 
         date_hash.set(day, today_duty)
 
-
-    for date in date_list:
-        for e in exp_types:
-            print(f"{e} : ", date_hash.get(date).get(e))
 
     # 6. 결과 출력
     export_results(date_list, date_hash, worker_data, duty_types+exp_types)

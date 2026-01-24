@@ -1,14 +1,21 @@
 import csv
 import calendar
+from enum import IntEnum
 from datetime import datetime
 from data_structures import ChainingHashTable, Circular_List, List_Pointer
-
+from filter import task_filter
 # --- [전역 매핑 변수] ---
 worker_info_map = ChainingHashTable(100)
 
+#가능근무 확인용  enum
+class DUTY_ENUM(IntEnum):
+    SUB_GUARD = 0
+    DISH = 1
+    NIGHT = 2
+    SENTINEL = 3
+    CCTV = 4
+
 # --- [로직 보조 함수] ---
-def is_date_in_range(target_date, start_date, end_date):
-    return start_date <= target_date <= end_date
 
 def get_start_index(c_list, last_sn):
     if not last_sn: return 0
@@ -16,12 +23,12 @@ def get_start_index(c_list, last_sn):
         if c_list.get_at(i) == last_sn: return i + 1
     return 0
 
-def get_next_available(ptr, assigned_set, duty_type=None):
+def get_next_available(ptr, assigned_set, duty_type):
     while True:
         sn = ptr.get_val()
-        info = worker_info_map.get(sn)
-        
-        if sn in assigned_set:
+        if sn == '25-760019':
+            print(worker_info_map.get(sn)['이름'], worker_info_map.get(sn)['가능근무'], duty_type, task_filter(sn, duty_type, worker_info_map))
+        if sn in assigned_set or task_filter(sn, duty_type, worker_info_map):
             continue
                 
         assigned_set.add(sn)
