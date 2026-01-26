@@ -1,5 +1,5 @@
 from data_structures import Circular_List, List_Pointer, ChainingHashTable
-from date import is_date_in_range, get_date_list
+from date import is_date_in_range, get_date_list, get_date_diff, get_formatted_date
 from filter import global_filter, task_filter
 from duty_engine import (
     load_all_data, get_start_index, get_next_available, 
@@ -39,7 +39,10 @@ def main():
     last_sr = input("선임초병 마지막 인원: ")
     last_jr = input("후임초병 마지막 인원: ")
     last_cctv = input("CCTV 마지막 인원: ")
-
+    ld_y, ld_m, ld_d = map(int, input("식기 마지막 날 (예: 2026 01 05): ").split())
+    
+    ld_date = get_formatted_date(ld_y, ld_m, ld_d)
+    
     ptr_sub_guard = List_Pointer(c_list_all, get_start_index(c_list_all, last_sub))
     ptr_dish = List_Pointer(c_list_all, get_start_index(c_list_all, last_dish))
     ptr_night = List_Pointer(c_list_all, get_start_index(c_list_all, last_night))
@@ -67,7 +70,7 @@ def main():
     global_filter(date_hash, date_list, exceptions)
 
     # 5. 배정 시작
-    dish_skip_count = 0
+    
     for day in date_list:
         today_duty = date_hash.get(day)
         
@@ -85,8 +88,8 @@ def main():
         today_duty.get("위병부조장").append(get_next_available(ptr_sub_guard, assigned_today, DUTY_ENUM.SUB_GUARD))
         
         # 2. 식기
-        dish_skip_count += 1
-        if dish_skip_count % 5 == 0:
+        
+        if get_date_diff(day, ld_date) % 5 == 0:
             today_duty.get("식기").append('72사단')
         else:
             for _ in range(3):
