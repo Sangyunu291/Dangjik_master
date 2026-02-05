@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>날짜 입력 받기</title>
+</head>
+<body>
+
+    <div class="container">
+        <h2>날짜 선택</h2>
+
+        <div class="input-group">
+            <label for="start-date">시작일:</label>
+            <input type="date" id="start-date" name="start-date">
+        </div>
+
+        <div class="input-group">
+            <label for="end-date">종료일:</label>
+            <input type="date" id="end-date" name="end-date">
+        </div>
+
+        <button type="button" onclick="uploadDateToServer()">전송</button>
+    </div>
+
+    <script>
+        async function uploadDateToServer() {
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+            const dateRange = {
+                startDate: document.getElementById('start-date').value,
+                endDate: document.getElementById('end-date').value
+            };
+
+            const response = await fetch('/upload_time', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dateRange) // 변수를 그대로 전달
+            });
+        }
+
+        
+    </script>
+
+</body>
+</html>
